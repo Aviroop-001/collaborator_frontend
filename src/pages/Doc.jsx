@@ -1,20 +1,18 @@
 // import "./Login.scss";
 import { BrowserRouter as Router, Link, useParams } from "react-router-dom";
-import { useContext, useRef, useState, useEffect } from "react";
+import { useContext, useState, useEffect } from "react";
 import { Context } from "../context/Context";
 import { Center, useToast, Grid, GridItem, Text, Divider, Flex, Tooltip } from "@chakra-ui/react";
+import { DeleteIcon, DownloadIcon, ArrowBackIcon } from "@chakra-ui/icons";
 import Editor from "../components/Editor"
 import API from "../api";
 import {
   Box,
   Input,
   Button,
-  FormControl,
-  FormLabel,
   Heading,
 } from "@chakra-ui/react";
 import UserList from "../components/UserList";
-import Editor2 from "../components/Editor2";
 
 const Doc = () => {
 
@@ -71,6 +69,23 @@ const Doc = () => {
     }
   };
 
+  const handleDelete = async () => {
+    try {
+      await API.delete(`/document/${documentId}`);
+      console.log("Document deleted successfully!");
+      window.location.href = `/`;
+    } catch (error) {
+      console.error("Error deleting document:", error);
+      toast({
+        title: "Couldn't delete doc :_(",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+        position: "top-right",
+      });
+    }
+  };
+
   useEffect(() => {
     fetchDocumentDetails();
   }, []);
@@ -83,6 +98,18 @@ const Doc = () => {
   return (
     <Grid templateColumns="1fr 3fr" gap={4} p={4}>
       <GridItem colSpan={1}>
+        <Tooltip label="Home">
+          <Button
+            onClick={() => {
+              window.location.href = `/`;
+            }}
+            colorScheme="white"
+            size="sm"
+            mb={2}
+          >
+            <ArrowBackIcon w={7} h={7} color="teal.500" />
+          </Button>
+        </Tooltip>
         <Box
           bg="white"
           p={4}
@@ -114,15 +141,33 @@ const Doc = () => {
             value={editableTitle}
             onChange={handleTitleChange}
             fontSize="1.3rem"
-            fontWeight='bold'
-            fontFamily='heading'
-            textAlign='center'
+            fontWeight="bold"
+            fontFamily="heading"
+            textAlign="center"
             mb={2}
           />
           <Flex justifyContent="flex-end">
-            <Button onClick={handleSave} mr={2} mb={2} colorScheme="green">
-              Save
-            </Button>
+            <Tooltip label="SAVE doc">
+              <Button
+                onClick={handleSave}
+                mr={2}
+                mb={2}
+                size="md"
+                colorScheme="white"
+              >
+                <DownloadIcon w={6} h={6} color="green.500" />
+              </Button>
+            </Tooltip>
+            <Tooltip label="Delete doc">
+              <Button
+                onClick={handleDelete}
+                size="md"
+                mb={2}
+                colorScheme="white"
+              >
+                <DeleteIcon w={5} h={5} color="red.500" />
+              </Button>
+            </Tooltip>
           </Flex>
           <Divider mb={4} />
           {editorContent && (

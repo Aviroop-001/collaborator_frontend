@@ -2,6 +2,7 @@
 import { BrowserRouter as Router, Link } from "react-router-dom";
 import { useContext, useRef, useState, useEffect } from "react";
 import { Context } from "../context/Context";
+import { ExternalLinkIcon, AddIcon, ArrowBackIcon } from "@chakra-ui/icons";
 import {
   Center,
   useToast,
@@ -93,20 +94,22 @@ const Home = () => {
       <Heading as="h1" size="xl" mb={20}>
         Collaborator
       </Heading>
-      <Flex width="30vw" justifyContent="space-between">
-        <Link to="/new-document">
+      <Flex width="20vw" justifyContent="space-around">
+        <Tooltip label="New Doc">
           <Button
-            colorScheme="blue"
+            colorScheme="white"
             size="md"
             mb={4}
             onClick={handleNewDocument}
           >
-            Create New Document
+            <AddIcon w={7} h={7} color="green.500" />
           </Button>
-        </Link>
-        <Button colorScheme="red" size="md" onClick={logoutHandler}>
-          Logout
-        </Button>
+        </Tooltip>
+        <Tooltip label="Logout !!!">
+          <Button colorScheme="white" size="md" onClick={logoutHandler}>
+            <ExternalLinkIcon w={7} h={7} color="red.500" />
+          </Button>
+        </Tooltip>
       </Flex>
 
       <Box mt={8} width="60vw">
