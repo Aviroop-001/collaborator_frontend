@@ -28,7 +28,25 @@ const Home = () => {
   const [myDocs, setMyDocs] = useState([]);
   const toast = useToast();
 
-  const handleNewDocument = () => {};
+  const handleNewDocument = async () => {
+    try {
+      const response = await API.post("document/create", {
+        userID: user._id,
+      });
+      const newDocumentId = response.data._id;
+      window.location.href = `/doc/${newDocumentId}`;
+    } catch (error) {
+      console.error("Error creating a new document:", error);
+      toast({
+        title: "Something went wrong :(",
+        description: "Couldn't create new doc",
+        status: "error",
+        duration: 4000,
+        isClosable: true,
+        position: "top-right",
+      });
+    }
+  };
 
   const handleFetchMyDocs = async () => {
     await API.get(`/document/user/${user._id}`)
@@ -77,7 +95,12 @@ const Home = () => {
       </Heading>
       <Flex width="30vw" justifyContent="space-between">
         <Link to="/new-document">
-          <Button colorScheme="blue" size="md" mb={4}>
+          <Button
+            colorScheme="blue"
+            size="md"
+            mb={4}
+            onClick={handleNewDocument}
+          >
             Create New Document
           </Button>
         </Link>

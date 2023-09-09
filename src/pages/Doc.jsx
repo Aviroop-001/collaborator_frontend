@@ -21,6 +21,7 @@ const Doc = () => {
   const { user, dispatch } = useContext(Context);
 
   const [editorContent, setEditorContent] = useState();
+  const [editableTitle, setEditableTitle] = useState("");
   const { documentId } = useParams();
   const [document, setDocument] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -28,12 +29,15 @@ const Doc = () => {
 
   const handleEditorChange = (newContent) => {
     setEditorContent(newContent);
-    console.log(newContent);
+  };
+
+  const handleTitleChange = (event) => {
+    setEditableTitle(event.target.value);
   };
 
   const handleSave = async () => {
     try {
-      await API.put(`/document/${documentId}`, {title: document.title, content: editorContent });
+      await API.put(`/document/${documentId}`, {title: editableTitle, content: editorContent });
       toast({
         title: "Doc saved",
         status: "success",
@@ -59,7 +63,7 @@ const Doc = () => {
       const response = await API.get(`/document/${documentId}`);
       setDocument(response.data);
       setEditorContent(response.data.content);
-      console.log(response.data.content);
+      setEditableTitle(response.data.title);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching document details:", error);
@@ -106,16 +110,24 @@ const Doc = () => {
           borderRadius="md"
           boxShadow="md"
         >
-          <Heading size="lg" mb={4}>
-            Text Editor
-          </Heading>
+          <Input
+            value={editableTitle}
+            onChange={handleTitleChange}
+            fontSize="1.3rem"
+            fontWeight='bold'
+            fontFamily='heading'
+            textAlign='center'
+            mb={2}
+          />
           <Flex justifyContent="flex-end">
             <Button onClick={handleSave} mr={2} mb={2} colorScheme="green">
               Save
             </Button>
           </Flex>
           <Divider mb={4} />
-          {editorContent && <Editor value={editorContent} onChange={handleEditorChange} />}
+          {editorContent && (
+            <Editor value={editorContent} onChange={handleEditorChange} />
+          )}
         </Box>
       </GridItem>
     </Grid>
