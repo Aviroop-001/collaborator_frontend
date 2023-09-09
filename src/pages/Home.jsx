@@ -1,9 +1,17 @@
 // import "./Login.scss";
 import { BrowserRouter as Router, Link } from "react-router-dom";
-import { useContext, useRef, useState } from "react";
+import { useContext, useRef, useState, useEffect } from "react";
 import { Context } from "../context/Context";
-import { Center, useToast, Grid, GridItem, Text, Divider, Flex } from "@chakra-ui/react";
-import Editor from "../components/Editor"
+import {
+  Center,
+  useToast,
+  Grid,
+  GridItem,
+  Text,
+  Divider,
+  Flex,
+  Tooltip, List, ListItem, Container, VStack
+} from "@chakra-ui/react";
 import API from "../api";
 import {
   Box,
@@ -13,86 +21,103 @@ import {
   FormLabel,
   Heading,
 } from "@chakra-ui/react";
-import UserList from "../components/UserList";
+import { generateSnippet } from "../functions/generateSnippet";
 
 const Home = () => {
-  const [editorContent, setEditorContent] = useState("");
-  const [myDocs, setMyDocs] = useState("");
-  const handleEditorChange = (newContent) => {
-    setEditorContent(newContent);
-  };
-  const handleSave = () => {
-    console.log("Saving content:", editorContent);
-  };
-   const handleNewDocument = () => {
+  const { user, dispatch } = useContext(Context);
+  const [myDocs, setMyDocs] = useState([]);
+  const toast = useToast();
+
+  const handleNewDocument = () => {};
+
+  const handleFetchMyDocs = async () => {
+    await API.get(`/document/user/${user._id}`)
+      .then((response) => {
+        setMyDocs(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching user documents:", error);
+      });
   };
 
-  const handleFetchMyDocs = () => {
-  }
-  const dummyActiveUsers = [
-    { id: 1, name: "User 1" },
-    { id: 2, name: "User 2" },
-  ];
+  const logoutHandler = () => {
+    try {
+      console.log("logout tried");
+      dispatch({ type: "LOGOUT" });
+      console.log("logout success");
+      toast({
+        title: "Logged out!!!",
+        description: "Log out successful. You can login again",
+        status: "success",
+        duration: 4000,
+        isClosable: true,
+        position: "top",
+      });
+    } catch (err) {
+      console.log(err);
+      toast({
+        title: "Something went wrong :(",
+        description: "Couldn't log out. Try again.",
+        status: "error",
+        duration: 4000,
+        isClosable: true,
+        position: "top",
+      });
+    }
+  };
+
+  useEffect(() => {
+    handleFetchMyDocs()
+  }, [user]);
 
   return (
-    <Grid templateColumns="1fr 3fr" gap={4} p={4}>
-      <GridItem colSpan={1}>
-        <Box
-          bg="white"
-          p={4}
-          borderWidth="1px"
-          borderRadius="md"
-          boxShadow="md"
-        >
-          <Heading size="md" mb={4}>
-            Active Users
-          </Heading>
-          <Box>
-            {dummyActiveUsers.map((user) => (
-              <Text key={user.id} fontSize="sm">
-                {user.username}
-              </Text>
-            ))}
-          </Box>
-        </Box>
-      </GridItem>
-      <GridItem colSpan={1}>
-        <Box
-          bg="white"
-          p={4}
-          borderWidth="1px"
-          borderRadius="md"
-          boxShadow="md"
-        >
-          <Heading size="lg" mb={4}>
-            Text Editor
-          </Heading>
-          <Flex justifyContent="flex-end">
-            <Button
-              onClick={handleSave}
-              mr={2}
-              mb={2}
-              colorScheme="green"
-            >
-              Save
-            </Button>
-            <Button
-              //   onClick={handleNewDocument}
-              colorScheme="red"
-              mr={2}
-              mb={2}
-            >
-              New Doc
-            </Button>
-            <Button colorScheme="blue" mb={2}>
-              My Docs
-            </Button>
-          </Flex>
-          <Divider mb={4} />
-          <Editor value={editorContent} onChange={handleEditorChange} />
-        </Box>
-      </GridItem>
-    </Grid>
+    <Container maxW="100vw" centerContent>
+      <Heading as="h1" size="xl" mb={20}>
+        Collaborator
+      </Heading>
+      <Flex width="30vw" justifyContent="space-between">
+        <Link to="/new-document">
+          <Button colorScheme="blue" size="md" mb={4}>
+            Create New Document
+          </Button>
+        </Link>
+        <Button colorScheme="red" size="md" onClick={logoutHandler}>
+          Logout
+        </Button>
+      </Flex>
+
+      <Box mt={8} width="60vw">
+        <Heading as="h5" size="md" mb={3} textAlign="left">
+          Your Documents:
+        </Heading>
+        <VStack spacing={4} align="stretch">
+          {myDocs.map((document) => (
+            <Link key={document._id} to={`/doc/${document._id}`}>
+              <Flex
+                p={4}
+                borderWidth="1px"
+                borderRadius="lg"
+                boxShadow="lg"
+                cursor="pointer"
+                _hover={{ bg: "blue.100" }}
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <VStack spacing={2} alignItems="start">
+                  <Text fontSize="lg">{document.title}</Text>
+                  <Text fontSize="sm" color="gray.500">
+                    Created on: {new Date(document.createdAt).toDateString()}
+                  </Text>
+                </VStack>
+                <Text fontSize="sm" color="gray.600">
+                  {generateSnippet(document.content)}
+                </Text>
+              </Flex>
+            </Link>
+          ))}
+        </VStack>
+      </Box>
+    </Container>
   );
 };
 

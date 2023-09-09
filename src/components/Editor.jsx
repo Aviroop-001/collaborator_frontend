@@ -14,10 +14,10 @@ const Editor = ({ value, onChange }) => {
       });
 
       quillInstance.current.on("text-change", () => {
-        const editorContent = quillInstance.current.root.innerHTML;
+        const editorContent = editorRef.current.children[0].innerHTML;
         onChange(editorContent);
       });
-
+      console.log(value);
       quillInstance.current.clipboard.dangerouslyPasteHTML(value);
     }
   }, [onChange, value]);
