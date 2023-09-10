@@ -2,13 +2,15 @@
 import { BrowserRouter as Router, Link, useParams } from "react-router-dom";
 import { useContext, useState, useEffect } from "react";
 import { Context } from "../context/Context";
-import { Center, useToast, Grid, GridItem, Text, Divider, Flex, Tooltip } from "@chakra-ui/react";
+import { Center, useToast, Grid, GridItem, Text, Divider, Flex, Tooltip, useClipboard } from "@chakra-ui/react";
 import {
   DeleteIcon,
   DownloadIcon,
   ArrowBackIcon,
   CheckIcon,
   EditIcon,
+  LinkIcon,
+  CopyIcon,
 } from "@chakra-ui/icons";
 import Editor from "../components/Editor"
 import Editor2 from "../components/Editor2";
@@ -30,6 +32,8 @@ const Doc = () => {
   const { documentId } = useParams();
   const [editMode, setEditMode] = useState(false);
   const toast = useToast();
+  const { onCopy: onCopyURL } = useClipboard(window.location.href);
+  const { onCopy: onCopyReadOnlyURL } = useClipboard(window.location.href.replace("/doc/", "/read/"));
 
   const handleTitleChange = (event) => {
     setEditableTitle(event.target.value);
@@ -78,6 +82,28 @@ const Doc = () => {
     }
   };
 
+  const handleCopyURLClick = () => {
+    onCopyURL();
+    toast({
+      title: "URL copied to clipboard",
+      status: "success",
+      duration: 1500,
+      isClosable: true,
+      position: "top-right",
+    });
+  };
+
+  const handleCopyReadOnlyURLClick = () => {
+    onCopyReadOnlyURL();
+    toast({
+      title: "read-only URL copied to clipboard",
+      status: "success",
+      duration: 1500,
+      isClosable: true,
+      position: "top-right",
+    });
+  };
+
 
   return (
     <Box bg="white" p={4} borderWidth="1px" borderRadius="md" boxShadow="md">
@@ -113,20 +139,55 @@ const Doc = () => {
             </Tooltip>
           </Flex>
         ) : (
-          <Flex justifyContent='center'>
-            <Heading>{editableTitle}{" "}</Heading>
+          <Flex justifyContent="center">
+            <Heading>{editableTitle} </Heading>
             <Tooltip label="Edit title">
-              <Button onClick={() => {setEditMode(true)}} size="md" mt={1} colorScheme="white">
+              <Button
+                onClick={() => {
+                  setEditMode(true);
+                }}
+                size="md"
+                mt={1}
+                colorScheme="white"
+              >
                 <EditIcon w={5} h={5} color="gray.500" />
               </Button>
             </Tooltip>
           </Flex>
         )}
 
-        <Flex justifyContent="flex-end">
+        <Flex justifyContent="flex-end" justifyContent='space-around'>
           <Tooltip label="Delete doc">
-            <Button onClick={handleDelete} size="md" mb={2} colorScheme="white">
+            <Button
+              onClick={handleDelete}
+              size="md"
+              mb={2}
+              colorScheme="white"
+              cursor="pointer"
+            >
               <DeleteIcon w={5} h={5} color="red.500" />
+            </Button>
+          </Tooltip>
+          <Tooltip label="Copy url">
+            <Button
+              cursor="pointer"
+              size="md"
+              mb={2}
+              colorScheme="white"
+              onClick={handleCopyURLClick}
+            >
+              <CopyIcon w={5} h={5} color="teal.500" />
+            </Button>
+          </Tooltip>
+          <Tooltip label="share read-only version" aria-label="A tooltip">
+            <Button
+              cursor="pointer"
+              size="md"
+              mb={2}
+              colorScheme="white"
+              onClick={handleCopyReadOnlyURLClick}
+            >
+              <LinkIcon w={5} h={5} color="teal.500" />
             </Button>
           </Tooltip>
         </Flex>

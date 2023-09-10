@@ -7,6 +7,8 @@ import Doc from "./pages/Doc";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
+import ReadOnlyEditor from "./components/ReadOnlyEditor";
+import ReadOnlyEditorPage from "./pages/ReadOnlyEditorPage";
 
 
 function App() {
@@ -21,7 +23,8 @@ function App() {
           <Route exact path="/" element={user ? <Home /> : <Login />} />
           <Route exact path="/register" element={<Register />} />
           <Route exact path="/login" element={user ? <Home /> : <Login />} />
-          <Route exact path="/doc/:documentId" element={<Doc />} />
+          <Route exact path="/doc/:documentId" element={user ? <Doc/>: <Login/>} />
+          <Route exact path="/read/:documentId" element={<ReadOnlyEditorPage/>} />
         </Routes>
       </Router>
     </div>

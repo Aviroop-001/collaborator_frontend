@@ -22,6 +22,7 @@ import {
   FormLabel,
   Heading,
 } from "@chakra-ui/react";
+import { calculateTimeAgo } from "../functions/updatedAgo";
 
 const Home = () => {
   const { user, dispatch } = useContext(Context);
@@ -90,7 +91,17 @@ const Home = () => {
 
   return (
     <Container maxW="100vw" centerContent>
-      <Heading as="h1" size="xl" fontSize='3rem' mb={20} mt={10} fontFamily='sans-serif' textShadow='2px 2px 1px #aeb0af' fontWeight='light' letterSpacing='5px'>
+      <Heading
+        as="h1"
+        size="xl"
+        fontSize="3rem"
+        mb={20}
+        mt={10}
+        fontFamily="sans-serif"
+        textShadow="2px 2px 1px #aeb0af"
+        fontWeight="light"
+        letterSpacing="5px"
+      >
         Collaborator
       </Heading>
       <Flex width="20vw" justifyContent="space-around">
@@ -113,7 +124,7 @@ const Home = () => {
 
       <Box mt={8} width="60vw">
         <Heading as="h5" size="md" mb={3} textAlign="left">
-          Your Documents:
+          {user.username}'s Docs -
         </Heading>
         <VStack spacing={4} align="stretch">
           {myDocs.map((document) => (
@@ -134,6 +145,7 @@ const Home = () => {
                     Created on: {new Date(document.createdAt).toDateString()}
                   </Text>
                 </VStack>
+                updated: {calculateTimeAgo(document.updatedAt)}
               </Flex>
             </Link>
           ))}
