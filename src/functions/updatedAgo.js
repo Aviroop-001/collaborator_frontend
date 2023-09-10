@@ -2,7 +2,7 @@ export const calculateTimeAgo = (timestamp) => {
   const currentTime = new Date();
   const updatedTime = new Date(timestamp);
 
-  const timeDifferenceInMilliseconds = currentTime - updatedTime;
+  const timeDifferenceInMilliseconds = Math.abs(currentTime - updatedTime);
   const timeDifferenceInSeconds = Math.floor(
     timeDifferenceInMilliseconds / 1000
   );
