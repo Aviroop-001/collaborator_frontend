@@ -1,10 +1,15 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "quill/dist/quill.snow.css";
 import Quill from "quill";
+import {io} from "socket.io-client"
+import socket from "../socket";
 
 const Editor = ({ value, onChange }) => {
   const editorRef = useRef(null);
   const quillInstance = useRef(null);
+
+  const [socket, setSocket] = useState();
+  const [quill, setQuill] = useState();
 
   useEffect(() => {
     if (editorRef.current && !quillInstance.current) {
@@ -17,10 +22,11 @@ const Editor = ({ value, onChange }) => {
         const editorContent = editorRef.current.children[0].innerHTML;
         onChange(editorContent);
       });
-      console.log(value);
       quillInstance.current.clipboard.dangerouslyPasteHTML(value);
+      setQuill(quillInstance.current)
     }
   }, [onChange, value]);
+
 
   return (
     <div>

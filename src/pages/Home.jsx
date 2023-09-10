@@ -22,7 +22,6 @@ import {
   FormLabel,
   Heading,
 } from "@chakra-ui/react";
-import { generateSnippet } from "../functions/generateSnippet";
 
 const Home = () => {
   const { user, dispatch } = useContext(Context);
@@ -135,9 +134,6 @@ const Home = () => {
                     Created on: {new Date(document.createdAt).toDateString()}
                   </Text>
                 </VStack>
-                <Text fontSize="sm" color="gray.600">
-                  {generateSnippet(document.content)}
-                </Text>
               </Flex>
             </Link>
           ))}

@@ -16,3 +16,29 @@ code {
   margin: 0;
   padding: 0;
 }
+
+.container .ql-editor {
+  width: 40rem;
+  min-height: 30rem;
+  /* padding: 1in; */
+  margin: 0.5rem;
+  box-shadow: 0 0 5px 0 rgba(102, 102, 102, 0.5);
+  background-color: white;
+}
+
+.container .ql-container.ql-snow {
+  border: none;
+  display: flex;
+  justify-content: center;
+}
+
+.container .ql-toolbar.ql-snow {
+  display: flex;
+  justify-content: center;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: #eeecf7;
+  border: none;
+  box-shadow: 0 0 5px 0 rgba(61, 61, 61, 0.5);
+}
