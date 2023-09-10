@@ -1,4 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useContext } from "react";
+import {
+  Box,
+  Heading, Span, Text, Flex
+} from "@chakra-ui/react";
+import { Context } from "../context/Context";
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import { io } from "socket.io-client";
@@ -17,14 +22,21 @@ const TOOLBAR_OPTIONS = [
 ];
 
 export default function Editor2({ editableTitle, setEditableTitle }) {
+  const { user, dispatch } = useContext(Context);
   const { documentId } = useParams();
   const [socket, setSocket] = useState();
   const [quill, setQuill] = useState();
+  const [activeUsers, setActiveUsers] = useState([]);
 
   //setting up socket
   useEffect(() => {
-    // const s = io("http://localhost:5000");
-    const s = io("https://collab-io.onrender.com");
+    const s = io("https://collab-io.onrender.com", {
+    // const s = io("http://localhost:5000", {
+      query: {
+        username: user.username,
+      },
+    });
+    // const s = io("https://collab-io.onrender.com");
     https: setSocket(s);
     return () => {
       s.disconnect();
@@ -36,12 +48,20 @@ export default function Editor2({ editableTitle, setEditableTitle }) {
     if (socket == null || quill == null) return;
 
     socket.once("load-document", (document) => {
-      setEditableTitle(document.title)
+      setEditableTitle(document.title);
       quill.setContents(document.content);
       quill.enable();
     });
 
     socket.emit("get-document", documentId);
+
+    socket.on("active-users", (users) => {
+      setActiveUsers(users);
+    });
+    return () => {
+      socket.off("active-users"); // Clean up event listener
+    };
+
   }, [socket, quill, documentId]);
 
   // autosave
@@ -89,6 +109,36 @@ export default function Editor2({ editableTitle, setEditableTitle }) {
     };
   }, [socket, quill]);
 
+  // When a user joins the room, update the active users list
+  useEffect(() => {
+    if (socket == null) return;
+
+    socket.on("user-joined", (userId) => {
+      setActiveUsers((prevUsers) => [...prevUsers, userId]);
+      console.log(`${userId} joined`);
+    });
+    // console.log(activeUsers);
+    return () => {
+      socket.off("user-joined");
+    };
+  }, [socket]);
+
+  // When a user leaves the room, update the active users list
+  useEffect(() => {
+    if (socket == null) return;
+
+    socket.on("user-left", (userId) => {
+      setActiveUsers((prevUsers) =>
+        prevUsers.filter((user) => user !== userId)
+      );
+      console.log(`${userId} left`);
+    });
+
+    return () => {
+      socket.off("user-left");
+    };
+  }, [socket]);
+
   const wrapperRef = useCallback((wrapper) => {
     if (wrapper == null) return;
 
@@ -104,5 +154,28 @@ export default function Editor2({ editableTitle, setEditableTitle }) {
     setQuill(q);
   }, []);
 
-  return <div className="container" ref={wrapperRef}></div>;
+  return (
+    <div>
+      <div>
+        <Heading
+          as="h1"
+          size="md"
+          fontSize="1.4rem"
+          fontFamily="sans-serif"
+          fontWeight="light"
+          display="inline-block"
+          mr={5}
+        >
+          Users -{" "}
+        </Heading>
+          {activeUsers.map((username) => (
+            <Text key={username} m={3} display="inline-block">
+              {username}
+            </Text>
+          ))}
+      </div>
+      <div className="container" ref={wrapperRef}></div>
+    </div>
+  );
+
 }
