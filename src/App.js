@@ -20,7 +20,7 @@ function App() {
       <Router>
         <Routes>
           <Route exact path="/test" element={<Home />} />
-          <Route exact path="/" element={user ? <Home /> : <Login />} />
+          <Route exact path="/" element={user ? <Home /> : <Register />} />
           <Route exact path="/register" element={<Register />} />
           <Route exact path="/login" element={user ? <Home /> : <Login />} />
           <Route exact path="/doc/:documentId" element={user ? <Doc/>: <Login/>} />
