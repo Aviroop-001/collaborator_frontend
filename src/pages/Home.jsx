@@ -90,7 +90,7 @@ const Home = () => {
 
   return (
     <Container maxW="100vw" centerContent>
-      <Heading as="h1" size="xl" mb={20}>
+      <Heading as="h1" size="xl" fontSize='3rem' mb={20} mt={10} fontFamily='sans-serif' textShadow='2px 2px 1px #aeb0af' fontWeight='light' letterSpacing='5px'>
         Collaborator
       </Heading>
       <Flex width="20vw" justifyContent="space-around">
