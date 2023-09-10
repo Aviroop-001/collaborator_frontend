@@ -27,6 +27,7 @@ export default function Editor2({ editableTitle, setEditableTitle }) {
   const [socket, setSocket] = useState();
   const [quill, setQuill] = useState();
   const [activeUsers, setActiveUsers] = useState([]);
+  const [typingUser, setTypingUser] = useState("");
 
   //setting up socket
   useEffect(() => {
@@ -58,6 +59,15 @@ export default function Editor2({ editableTitle, setEditableTitle }) {
     socket.on("active-users", (users) => {
       setActiveUsers(users);
     });
+
+    socket.on("highlight-user", (typingUser) => {
+      setTypingUser(typingUser); // Set the typing user received from the server
+      setTimeout(() => {
+        setTypingUser("");
+      }, 1000);
+    });
+
+
     return () => {
       socket.off("active-users"); // Clean up event listener
     };
@@ -100,16 +110,24 @@ export default function Editor2({ editableTitle, setEditableTitle }) {
 
     const handler = (delta, oldDelta, source) => {
       if (source !== "user") return;
-      socket.emit("send-changes", delta);
+      const username = user.username;
+      const deltaWithAuthor = {
+        ops: delta.ops,
+        attributes: {
+          author: username,
+        },
+      };
+      socket.emit("send-changes", deltaWithAuthor);
     };
     quill.on("text-change", handler);
+    // quill.on("text-change", handleKeyPress);
 
     return () => {
       quill.off("text-change", handler);
     };
   }, [socket, quill]);
 
-  // When a user joins the room, update the active users list
+  // When a user joins the room
   useEffect(() => {
     if (socket == null) return;
 
@@ -123,7 +141,7 @@ export default function Editor2({ editableTitle, setEditableTitle }) {
     };
   }, [socket]);
 
-  // When a user leaves the room, update the active users list
+  // When a user leaves the room
   useEffect(() => {
     if (socket == null) return;
 
@@ -138,6 +156,7 @@ export default function Editor2({ editableTitle, setEditableTitle }) {
       socket.off("user-left");
     };
   }, [socket]);
+
 
   const wrapperRef = useCallback((wrapper) => {
     if (wrapper == null) return;
@@ -169,11 +188,18 @@ export default function Editor2({ editableTitle, setEditableTitle }) {
         >
           Users -{" "}
         </Heading>
-          {activeUsers.map((username) => (
-            <Text key={username} mr={3} display="inline-block">
-              {username}
-            </Text>
-          ))}
+        {activeUsers.map((username) => (
+          <Text
+            key={username}
+            mr={3}
+            display="inline-block"
+            fontWeight={username === typingUser ? "bold" : "normal"}
+            color={username === typingUser ? "green.600" : "black"}
+            fontFamily={username === typingUser ? "sans-serif" : "serif"}
+          >
+            {username}
+          </Text>
+        ))}
       </div>
       <div className="container" ref={wrapperRef}></div>
     </div>
