@@ -165,11 +165,12 @@ export default function Editor2({ editableTitle, setEditableTitle }) {
           fontWeight="light"
           display="inline-block"
           mr={5}
+          mb={1}
         >
           Users -{" "}
         </Heading>
           {activeUsers.map((username) => (
-            <Text key={username} m={3} display="inline-block">
+            <Text key={username} mr={3} display="inline-block">
               {username}
             </Text>
           ))}
