@@ -24,7 +24,7 @@ export default function Editor2({ editableTitle, setEditableTitle }) {
   //setting up socket
   useEffect(() => {
     // const s = io("http://localhost:5000");
-    const s = io("https://collab-io.onrender.com/");
+    const s = io("https://collab-io.onrender.com");
     https: setSocket(s);
     return () => {
       s.disconnect();
