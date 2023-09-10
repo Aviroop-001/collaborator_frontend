@@ -2,10 +2,8 @@ import axios from "axios";
 
 export default axios.create({
   // //! Localhost SERVER
-  baseURL: `http://localhost:5000/api/`
+  // baseURL: `http://localhost:5000/api/`
 
   // //! LIVE SERVER
-  // baseURL: `https://aviroop-blog-api.herokuapp.com/api`
-
-//   baseURL: `https://aviroop-blog-api.onrender.com/api`,
+  baseURL: `https://collab-io.onrender.com/api/`
 });
